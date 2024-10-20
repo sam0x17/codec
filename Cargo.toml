@@ -1,0 +1,9 @@
+[package]
+name = "codec"
+version = "0.1.0"
+edition = "2021"
+authors = ["sam0x17"]
+keywords = ["codec", "bincode", "encoding", "decoding"]
+description = "A crate for encoding and decoding arbitrary rust types without having to worry about the orphan rule."
+
+[dependencies]
