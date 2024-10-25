@@ -7,3 +7,8 @@ keywords = ["codec", "bincode", "encoding", "decoding"]
 description = "A crate for encoding and decoding arbitrary rust types without having to worry about the orphan rule."
 
 [dependencies]
+
+
+[features]
+default = []
+std = []
