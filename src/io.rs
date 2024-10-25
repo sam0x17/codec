@@ -12,6 +12,13 @@ pub enum ReadError {
     IoError(std::io::Error),
 }
 
+#[cfg(feature = "std")]
+impl From<std::io::Error> for ReadError {
+    fn from(e: std::io::Error) -> Self {
+        ReadError::IoError(e)
+    }
+}
+
 impl Debug for ReadError {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
@@ -28,6 +35,13 @@ pub enum WriteError {
     InsufficientSpace,
     #[cfg(feature = "std")]
     IoError(std::io::Error),
+}
+
+#[cfg(feature = "std")]
+impl From<std::io::Error> for WriteError {
+    fn from(e: std::io::Error) -> Self {
+        WriteError::IoError(e)
+    }
 }
 
 impl Debug for WriteError {
