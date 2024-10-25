@@ -2,7 +2,6 @@
 
 use core::fmt::{Debug, Formatter};
 
-#[cfg_attr(feature = "std", derive(std::error::Error))]
 pub enum ReadError {
     InsufficientData,
     #[cfg(feature = "std")]
@@ -21,7 +20,6 @@ impl Debug for ReadError {
     }
 }
 
-#[cfg_attr(feature = "std", derive(std::error::Error))]
 pub enum WriteError {
     InsufficientSpace,
     #[cfg(feature = "std")]
@@ -99,14 +97,11 @@ fn test_write() {
     assert_eq!(buf, [1, 2, 3, 4, 5]);
 }
 
-// mod _impl {
+pub trait Codec: Sized {
+    fn encode(&self, io: &mut impl Write) -> Result<(), WriteError>;
+    fn decode(io: &mut impl Read) -> Result<Self, ReadError>;
+}
 
-//     pub trait Codec: Sized {
-//         fn encode(&self, io: &mut impl Write) -> Result<()>;
-//         fn decode(io: &mut impl Read) -> Result<Self>;
-//     }
-
-//     pub fn decode<T: Codec>(io: &mut impl Read) -> Result<T> {
-//         T::decode(io)
-//     }
-// }
+pub fn decode<T: Codec>(io: &mut impl Read) -> Result<T, ReadError> {
+    T::decode(io)
+}
