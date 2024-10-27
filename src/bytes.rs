@@ -105,6 +105,18 @@ impl Bytes {
     }
 }
 
+impl Default for &Bytes {
+    fn default() -> Self {
+        Bytes::from_slice(&[])
+    }
+}
+
+impl Default for &mut Bytes {
+    fn default() -> Self {
+        Bytes::from_slice_mut(&mut [])
+    }
+}
+
 impl<'a> From<&'a [u8]> for &'a Bytes {
     fn from(slice: &'a [u8]) -> Self {
         Bytes::from_slice(slice)

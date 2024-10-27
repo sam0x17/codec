@@ -6,6 +6,8 @@ use alloc::vec::Vec;
 
 use core::fmt::{Debug, Formatter};
 
+use crate::bytes::Bytes;
+
 pub enum ReadError {
     InsufficientData,
     #[cfg(feature = "std")]
@@ -94,14 +96,14 @@ pub trait Write {
     fn write<const N: usize>(&mut self, data: &[u8; N]) -> Result<(), WriteError>;
 }
 
-impl Write for &mut [u8] {
+impl Write for &mut Bytes {
     fn write<const N: usize>(&mut self, data: &[u8; N]) -> Result<(), WriteError> {
         if self.len() < N {
             return Err(WriteError::InsufficientSpace);
         }
         let (to_write, rest) = core::mem::take(self).split_at_mut(N);
         to_write.copy_from_slice(data);
-        *self = rest;
+        *self = Bytes::from_slice_mut(rest);
         Ok(())
     }
 }
@@ -146,7 +148,7 @@ fn test_read_to_end() {
 #[test]
 fn test_write() {
     let mut buf = [0; 5];
-    let mut slice = &mut buf[..];
+    let slice = &mut Bytes::from_slice_mut(&mut buf);
     slice.write(&[1, 2]).unwrap();
     slice.write(&[3, 4]).unwrap();
     let result = slice.write(&[6, 7, 8]);
