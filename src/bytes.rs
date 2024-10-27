@@ -289,3 +289,210 @@ fn test_cmp() {
     assert!(bytes2 > bytes1);
     assert!(bytes1 != bytes2);
 }
+
+#[test]
+fn test_split_at() {
+    let data = [1, 2, 3, 4, 5];
+    let bytes = Bytes::from_slice(&data);
+    let (left, right) = bytes.split_at(3);
+    assert_eq!(left, &[1, 2, 3]);
+    assert_eq!(right, &[4, 5]);
+}
+
+#[test]
+fn test_split_at_bounds() {
+    let data = [10, 20, 30, 40];
+    let bytes = Bytes::from_slice(&data);
+
+    // Split at the beginning
+    let (left, right) = bytes.split_at(0);
+    assert!(left.is_empty());
+    assert_eq!(right, &[10, 20, 30, 40]);
+
+    // Split at the end
+    let (left, right) = bytes.split_at(4);
+    assert_eq!(left, &[10, 20, 30, 40]);
+    assert!(right.is_empty());
+}
+
+#[test]
+fn test_trim_ascii_start() {
+    let data = b"   Hello";
+    let bytes = Bytes::from_slice(data);
+    let trimmed = bytes.trim_ascii_start();
+    assert_eq!(trimmed, b"Hello");
+}
+
+#[test]
+fn test_trim_ascii_end() {
+    let data = b"Hello   ";
+    let bytes = Bytes::from_slice(data);
+    let trimmed = bytes.trim_ascii_end();
+    assert_eq!(trimmed, b"Hello");
+}
+
+#[test]
+fn test_trim_ascii() {
+    let data = b"   Hello   ";
+    let bytes = Bytes::from_slice(data);
+    let trimmed = bytes.trim_ascii();
+    assert_eq!(trimmed, b"Hello");
+}
+
+#[test]
+fn test_is_ascii() {
+    let ascii_data = b"Hello, World!";
+    let non_ascii_data = &[0xFF, 0x80, 0x7F, 0x40];
+
+    let ascii_bytes = Bytes::from_slice(ascii_data);
+    let non_ascii_bytes = Bytes::from_slice(non_ascii_data);
+
+    assert!(ascii_bytes.is_ascii());
+    assert!(!non_ascii_bytes.is_ascii());
+}
+
+#[test]
+fn test_first_and_last() {
+    let data = [1, 2, 3, 4, 5];
+    let bytes = Bytes::from_slice(&data);
+
+    assert_eq!(bytes.first(), Some(&1));
+    assert_eq!(bytes.last(), Some(&5));
+
+    let empty: &[u8] = &[];
+    let empty_bytes = Bytes::from_slice(empty);
+    assert_eq!(empty_bytes.first(), None);
+    assert_eq!(empty_bytes.last(), None);
+}
+
+#[test]
+fn test_split_first() {
+    let data = [1, 2, 3, 4];
+    let bytes = Bytes::from_slice(&data);
+
+    if let Some((first, rest)) = bytes.split_first() {
+        assert_eq!(first, &1);
+        assert_eq!(rest, &[2, 3, 4]);
+    } else {
+        panic!("Expected Some((first, rest))");
+    }
+
+    let empty: &[u8] = &[];
+    let empty_bytes = Bytes::from_slice(empty);
+    assert_eq!(empty_bytes.split_first(), None);
+}
+
+#[test]
+fn test_split_last() {
+    let data = [1, 2, 3, 4];
+    let bytes = Bytes::from_slice(&data);
+
+    if let Some((last, rest)) = bytes.split_last() {
+        assert_eq!(last, &4);
+        assert_eq!(rest, &[1, 2, 3]);
+    } else {
+        panic!("Expected Some((last, rest))");
+    }
+
+    let empty: &[u8] = &[];
+    let empty_bytes = Bytes::from_slice(empty);
+    assert_eq!(empty_bytes.split_last(), None);
+}
+
+#[test]
+fn test_first_chunk() {
+    let data = [1, 2, 3, 4, 5, 6, 7];
+    let bytes = Bytes::from_slice(&data);
+
+    let chunk = bytes.first_chunk::<3>();
+    assert_eq!(chunk, Some(&[1, 2, 3]));
+
+    let chunk = bytes.first_chunk::<8>();
+    assert_eq!(chunk, None);
+}
+
+#[test]
+fn test_last_chunk() {
+    let data = [1, 2, 3, 4, 5, 6, 7];
+    let bytes = Bytes::from_slice(&data);
+
+    let chunk = bytes.last_chunk::<3>();
+    assert_eq!(chunk, Some(&[5, 6, 7]));
+
+    let chunk = bytes.last_chunk::<8>();
+    assert_eq!(chunk, None);
+}
+
+#[test]
+fn test_split_first_chunk() {
+    let data = [1, 2, 3, 4, 5, 6, 7];
+    let bytes = Bytes::from_slice(&data);
+
+    if let Some((chunk, rest)) = bytes.split_first_chunk::<3>() {
+        assert_eq!(chunk, &[1, 2, 3]);
+        assert_eq!(rest, &[4, 5, 6, 7]);
+    } else {
+        panic!("Expected Some((chunk, rest))");
+    }
+
+    let bytes = Bytes::from_slice(&[1, 2]);
+    assert_eq!(bytes.split_first_chunk::<3>(), None);
+}
+
+#[test]
+fn test_split_last_chunk() {
+    let data = [1, 2, 3, 4, 5, 6, 7];
+    let bytes = Bytes::from_slice(&data);
+
+    if let Some((rest, chunk)) = bytes.split_last_chunk::<3>() {
+        assert_eq!(rest, &[1, 2, 3, 4]);
+        assert_eq!(chunk, &[5, 6, 7]);
+    } else {
+        panic!("Expected Some((rest, chunk))");
+    }
+
+    let bytes = Bytes::from_slice(&[1, 2]);
+    assert_eq!(bytes.split_last_chunk::<3>(), None);
+}
+
+#[test]
+fn test_as_ptr() {
+    let data = [1, 2, 3, 4];
+    let bytes = Bytes::from_slice(&data);
+    assert_eq!(bytes.as_ptr(), data.as_ptr());
+}
+
+#[test]
+fn test_as_ptr_range() {
+    let data = [1, 2, 3, 4];
+    let bytes = Bytes::from_slice(&data);
+    assert_eq!(bytes.as_ptr_range(), data.as_ptr_range());
+}
+
+#[test]
+fn test_empty_bytes() {
+    let empty: &[u8] = &[];
+    let bytes = Bytes::from_slice(empty);
+    assert_eq!(bytes.len(), 0);
+    assert!(bytes.is_empty());
+    assert_eq!(bytes.first(), None);
+    assert_eq!(bytes.last(), None);
+    assert_eq!(bytes.split_first(), None);
+    assert_eq!(bytes.split_last(), None);
+}
+
+#[test]
+fn test_partial_eq_with_slice() {
+    let data = [1, 2, 3, 4];
+    let bytes = Bytes::from_slice(&data);
+    assert_eq!(bytes, &[1, 2, 3, 4]);
+    assert_ne!(bytes, &[1, 2, 3]);
+}
+
+#[test]
+fn test_partial_eq_with_array() {
+    let data = [1, 2, 3, 4];
+    let bytes = Bytes::from_slice(&data);
+    assert_eq!(bytes, &[1, 2, 3, 4]);
+    assert_ne!(bytes, &[1, 2, 3]);
+}
