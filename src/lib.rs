@@ -1,6 +1,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 pub mod bytes;
+pub mod bytes_buf;
 pub mod bytes_sized;
 pub mod io;
 

@@ -1,7 +1,7 @@
 use crate::bytes::Bytes;
 use core::ops::{Deref, DerefMut};
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(transparent)]
 pub struct BytesSized<const N: usize>([u8; N]);
 
@@ -226,12 +226,14 @@ impl<'a, const N: usize> From<&'a BytesSized<N>> for &'a [u8; N] {
 impl<const N: usize> Deref for BytesSized<N> {
     type Target = [u8; N];
 
+    #[inline]
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
 
 impl<const N: usize> DerefMut for BytesSized<N> {
+    #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
     }

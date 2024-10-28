@@ -218,12 +218,14 @@ impl PartialEq<Bytes> for &[u8] {
 impl Deref for Bytes {
     type Target = [u8];
 
+    #[inline]
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
 
 impl DerefMut for Bytes {
+    #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
     }
