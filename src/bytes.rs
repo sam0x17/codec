@@ -5,23 +5,32 @@ use core::ops::{Deref, DerefMut, Range};
 pub struct Bytes([u8]);
 
 impl Bytes {
+    #[inline]
+    pub const fn as_slice(&self) -> &[u8] {
+        &self.0
+    }
+
     /// Create a new `Bytes` from a slice of bytes
+    #[inline]
     pub const fn from_slice(slice: &[u8]) -> &Self {
         // Safety: `Bytes` is a transparent wrapper around `[u8]`
         unsafe { &*(slice as *const [u8] as *const Bytes) }
     }
 
     /// Create a new `Bytes` from a mutable slice of bytes
+    #[inline]
     pub fn from_slice_mut(slice: &mut [u8]) -> &mut Self {
         // Safety: `Bytes` is a transparent wrapper around `[u8]`
         unsafe { &mut *(slice as *mut [u8] as *mut Bytes) }
     }
 
+    #[inline]
     pub const fn split_at(&self, mid: usize) -> (&Self, &Self) {
         let (left, right) = self.0.split_at(mid);
         (Bytes::from_slice(left), Bytes::from_slice(right))
     }
 
+    #[inline]
     pub const fn split_at_checked(&self, mid: usize) -> Option<(&Self, &Self)> {
         match self.0.split_at_checked(mid) {
             Some((left, right)) => Some((Bytes::from_slice(left), Bytes::from_slice(right))),
@@ -29,43 +38,53 @@ impl Bytes {
         }
     }
 
+    #[inline]
     pub const fn split_at_unchecked(&self, mid: usize) -> (&Self, &Self) {
         let (left, right) = unsafe { self.0.split_at_unchecked(mid) };
         (Bytes::from_slice(left), Bytes::from_slice(right))
     }
 
+    #[inline]
     pub const fn is_ascii(&self) -> bool {
         self.0.is_ascii()
     }
 
+    #[inline]
     pub const fn trim_ascii_start(&self) -> &Self {
         Bytes::from_slice(self.0.trim_ascii_start())
     }
 
+    #[inline]
     pub const fn trim_ascii_end(&self) -> &Self {
         Bytes::from_slice(self.0.trim_ascii_end())
     }
 
+    #[inline]
     pub const fn trim_ascii(&self) -> &Self {
         Bytes::from_slice(self.0.trim_ascii())
     }
 
+    #[inline]
     pub const fn is_empty(&self) -> bool {
         self.0.is_empty()
     }
 
+    #[inline]
     pub const fn len(&self) -> usize {
         self.0.len()
     }
 
+    #[inline]
     pub const fn first(&self) -> Option<&u8> {
         self.0.first()
     }
 
+    #[inline]
     pub const fn last(&self) -> Option<&u8> {
         self.0.last()
     }
 
+    #[inline]
     pub const fn split_first(&self) -> Option<(&u8, &Self)> {
         match self.0.split_first() {
             Some((first, rest)) => Some((first, Bytes::from_slice(rest))),
@@ -73,6 +92,7 @@ impl Bytes {
         }
     }
 
+    #[inline]
     pub const fn split_last(&self) -> Option<(&u8, &Self)> {
         match self.0.split_last() {
             Some((last, rest)) => Some((last, Bytes::from_slice(rest))),
@@ -80,26 +100,32 @@ impl Bytes {
         }
     }
 
+    #[inline]
     pub const fn first_chunk<const N: usize>(&self) -> Option<&[u8; N]> {
         self.0.first_chunk()
     }
 
+    #[inline]
     pub const fn split_first_chunk<const N: usize>(&self) -> Option<(&[u8; N], &[u8])> {
         self.0.split_first_chunk()
     }
 
+    #[inline]
     pub const fn split_last_chunk<const N: usize>(&self) -> Option<(&[u8], &[u8; N])> {
         self.0.split_last_chunk()
     }
 
+    #[inline]
     pub const fn last_chunk<const N: usize>(&self) -> Option<&[u8; N]> {
         self.0.last_chunk()
     }
 
+    #[inline]
     pub const fn as_ptr(&self) -> *const u8 {
         self.0.as_ptr()
     }
 
+    #[inline]
     pub const fn as_ptr_range(&self) -> Range<*const u8> {
         self.0.as_ptr_range()
     }
