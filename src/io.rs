@@ -93,15 +93,16 @@ impl Read for &[u8] {
 }
 
 pub trait Write {
-    fn write<const N: usize>(&mut self, data: &[u8; N]) -> Result<(), WriteError>;
+    fn write<'a>(&mut self, data: impl Into<&'a Bytes>) -> Result<(), WriteError>;
 }
 
 impl Write for &mut Bytes {
-    fn write<const N: usize>(&mut self, data: &[u8; N]) -> Result<(), WriteError> {
-        if self.len() < N {
+    fn write<'a>(&mut self, data: impl Into<&'a Bytes>) -> Result<(), WriteError> {
+        let data = data.into();
+        if self.len() < data.len() {
             return Err(WriteError::InsufficientSpace);
         }
-        let (to_write, rest) = core::mem::take(self).split_at_mut(N);
+        let (to_write, rest) = core::mem::take(self).split_at_mut(data.len());
         to_write.copy_from_slice(data);
         *self = Bytes::from_slice_mut(rest);
         Ok(())

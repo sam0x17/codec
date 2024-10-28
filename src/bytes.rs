@@ -129,6 +129,30 @@ impl<'a> From<&'a mut [u8]> for &'a mut Bytes {
     }
 }
 
+impl<'a, const N: usize> From<&'a [u8; N]> for &'a Bytes {
+    fn from(data: &'a [u8; N]) -> Self {
+        Bytes::from_slice(data)
+    }
+}
+
+impl<'a, const N: usize> From<&'a mut [u8; N]> for &'a mut Bytes {
+    fn from(data: &'a mut [u8; N]) -> Self {
+        Bytes::from_slice_mut(data)
+    }
+}
+
+impl<'a> From<&'a Bytes> for &'a [u8] {
+    fn from(bytes: &'a Bytes) -> Self {
+        &bytes.0
+    }
+}
+
+impl<'a> From<&'a mut Bytes> for &'a mut [u8] {
+    fn from(bytes: &'a mut Bytes) -> Self {
+        &mut bytes.0
+    }
+}
+
 impl PartialEq<[u8]> for Bytes {
     fn eq(&self, other: &[u8]) -> bool {
         self.0 == *other
