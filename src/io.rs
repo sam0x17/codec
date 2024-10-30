@@ -6,7 +6,7 @@ use alloc::vec::Vec;
 
 use core::fmt::{Debug, Formatter};
 
-use crate::bytes::Bytes;
+use crate::byte_slice::ByteSlice;
 
 pub enum ReadError {
     InsufficientData,
@@ -93,18 +93,18 @@ impl Read for &[u8] {
 }
 
 pub trait Write {
-    fn write<'a>(&mut self, data: impl Into<&'a Bytes>) -> Result<(), WriteError>;
+    fn write<'a>(&mut self, data: impl Into<&'a ByteSlice>) -> Result<(), WriteError>;
 }
 
-impl Write for &mut Bytes {
-    fn write<'a>(&mut self, data: impl Into<&'a Bytes>) -> Result<(), WriteError> {
+impl Write for &mut ByteSlice {
+    fn write<'a>(&mut self, data: impl Into<&'a ByteSlice>) -> Result<(), WriteError> {
         let data = data.into();
         if self.len() < data.len() {
             return Err(WriteError::InsufficientSpace);
         }
         let (to_write, rest) = core::mem::take(self).split_at_mut(data.len());
         to_write.copy_from_slice(data);
-        *self = Bytes::from_slice_mut(rest);
+        *self = ByteSlice::from_slice_mut(rest);
         Ok(())
     }
 }
@@ -149,7 +149,7 @@ fn test_read_to_end() {
 #[test]
 fn test_write() {
     let mut buf = [0; 5];
-    let slice = &mut Bytes::from_slice_mut(&mut buf);
+    let slice = &mut ByteSlice::from_slice_mut(&mut buf);
     slice.write(&[1, 2]).unwrap();
     slice.write(&[3, 4]).unwrap();
     let result = slice.write(&[6, 7, 8]);

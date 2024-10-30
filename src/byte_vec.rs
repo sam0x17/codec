@@ -3,12 +3,12 @@ use core::ops::{Deref, DerefMut};
 
 use alloc::vec::Vec;
 
-use crate::bytes::Bytes;
+use crate::byte_slice::ByteSlice;
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct BytesBuf(Vec<u8>);
+pub struct ByteVec(Vec<u8>);
 
-impl BytesBuf {
+impl ByteVec {
     #[inline]
     pub fn new() -> Self {
         Self(Vec::new())
@@ -25,12 +25,12 @@ impl BytesBuf {
     }
 
     #[inline]
-    pub fn as_bytes(&self) -> &Bytes {
-        Bytes::from_slice(self.as_slice())
+    pub fn as_bytes(&self) -> &ByteSlice {
+        ByteSlice::from_slice(self.as_slice())
     }
 }
 
-impl Deref for BytesBuf {
+impl Deref for ByteVec {
     type Target = [u8];
 
     #[inline]
@@ -39,7 +39,7 @@ impl Deref for BytesBuf {
     }
 }
 
-impl DerefMut for BytesBuf {
+impl DerefMut for ByteVec {
     #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
         self.0.as_mut_slice()
