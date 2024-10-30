@@ -10,3 +10,5 @@ pub trait Bytes {
     fn as_bytes(&self) -> &ByteSlice;
     fn as_slice(&self) -> &[u8];
 }
+
+// TODO: get rid of deref impls and make everything non-panicking
