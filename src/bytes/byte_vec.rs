@@ -3,7 +3,7 @@ use core::ops::{Deref, DerefMut};
 
 use alloc::vec::Vec;
 
-use crate::byte_slice::ByteSlice;
+use crate::bytes::ByteSlice;
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct ByteVec(Vec<u8>);

@@ -6,7 +6,7 @@ use alloc::vec::Vec;
 
 use core::fmt::{Debug, Formatter};
 
-use crate::byte_slice::ByteSlice;
+use crate::bytes::ByteSlice;
 
 pub enum ReadError {
     InsufficientData,

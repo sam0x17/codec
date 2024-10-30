@@ -1,4 +1,4 @@
-use crate::byte_slice::ByteSlice;
+use crate::bytes::ByteSlice;
 use core::ops::{Deref, DerefMut};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]

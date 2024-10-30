@@ -1,8 +1,6 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
-pub mod byte_array;
-pub mod byte_slice;
-pub mod byte_vec;
+pub mod bytes;
 pub mod io;
 
 use io::*;
