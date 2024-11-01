@@ -1,4 +1,9 @@
-use core::ops::{Deref, DerefMut, Range};
+use core::{
+    ops::{Deref, DerefMut, Range},
+    slice::SliceIndex,
+};
+
+use super::{ByteVec, Bytes};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(transparent)]
@@ -230,6 +235,68 @@ impl DerefMut for ByteSlice {
     #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
+    }
+}
+
+impl Bytes for ByteSlice {
+    #[inline]
+    fn as_bytes(&self) -> &ByteSlice {
+        self
+    }
+
+    #[inline]
+    fn as_slice(&self) -> &[u8] {
+        &self.0
+    }
+
+    #[inline]
+    fn get(&self, index: usize) -> Option<u8> {
+        self.0.get(index).copied()
+    }
+
+    #[inline]
+    fn get_mut(&mut self, index: usize) -> Option<&mut u8> {
+        self.0.get_mut(index)
+    }
+
+    #[inline]
+    fn len(&self) -> usize {
+        self.0.len()
+    }
+
+    #[inline]
+    fn split_at(&self, mid: usize) -> (&ByteSlice, &ByteSlice) {
+        let (left, right) = self.0.split_at(mid);
+        (ByteSlice::from_slice(left), ByteSlice::from_slice(right))
+    }
+
+    #[inline]
+    fn split_at_mut(&mut self, mid: usize) -> (&mut ByteSlice, &mut ByteSlice) {
+        let (left, right) = self.0.split_at_mut(mid);
+        (
+            ByteSlice::from_slice_mut(left),
+            ByteSlice::from_slice_mut(right),
+        )
+    }
+
+    #[inline]
+    fn to_vec(&self) -> ByteVec {
+        todo!()
+    }
+
+    #[inline]
+    fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+
+    #[inline]
+    fn range(&self, range: impl SliceIndex<[u8], Output = [u8]>) -> &ByteSlice {
+        ByteSlice::from_slice(&self.0[range])
+    }
+
+    #[inline]
+    fn range_mut(&mut self, range: impl SliceIndex<[u8], Output = [u8]>) -> &mut ByteSlice {
+        ByteSlice::from_slice_mut(&mut self.0[range])
     }
 }
 
@@ -561,4 +628,74 @@ fn test_partial_eq_with_array() {
     let bytes = ByteSlice::from_slice(&data);
     assert_eq!(bytes, &[1, 2, 3, 4]);
     assert_ne!(bytes, &[1, 2, 3]);
+}
+
+#[test]
+fn test_bytes_as_bytes() {
+    let data = [1, 2, 3, 4];
+    let bytes = ByteSlice::from_slice(&data);
+    assert_eq!(bytes.as_bytes(), bytes);
+}
+
+#[test]
+fn test_bytes_as_slice() {
+    let data = [1, 2, 3, 4];
+    let bytes = ByteSlice::from_slice(&data);
+    assert_eq!(bytes.as_slice(), &data);
+}
+
+#[test]
+fn test_bytes_get() {
+    let data = [10, 20, 30];
+    let bytes = ByteSlice::from_slice(&data);
+    assert_eq!(bytes.get(1), Some(20));
+    assert_eq!(bytes.get(3), None);
+}
+
+#[test]
+fn test_bytes_get_mut() {
+    let mut data = [10, 20, 30];
+    let bytes = ByteSlice::from_slice_mut(&mut data);
+    if let Some(value) = bytes.get_mut(1) {
+        *value = 99;
+    }
+    assert_eq!(bytes, &[10, 99, 30]);
+    assert!(bytes.get_mut(3).is_none());
+}
+
+#[test]
+fn test_bytes_split_at() {
+    let data = [1, 2, 3, 4, 5];
+    let bytes = ByteSlice::from_slice(&data);
+    let (left, right) = bytes.split_at(3);
+    assert_eq!(left, &[1, 2, 3]);
+    assert_eq!(right, &[4, 5]);
+}
+
+#[test]
+fn test_bytes_split_at_mut() {
+    let mut data = [1, 2, 3, 4, 5];
+    let bytes = ByteSlice::from_slice_mut(&mut data);
+    let (left, right) = bytes.split_at_mut(3);
+    left.fill(0);
+    right.fill(9);
+    assert_eq!(bytes, &[0, 0, 0, 9, 9]);
+}
+
+#[test]
+fn test_bytes_range() {
+    let data = [5, 6, 7, 8, 9];
+    let bytes = ByteSlice::from_slice(&data);
+    let range = bytes.range(1..4);
+    assert_eq!(range, &[6, 7, 8]);
+}
+
+#[test]
+fn test_bytes_range_mut() {
+    let mut data = [5, 6, 7, 8, 9];
+    let bytes = ByteSlice::from_slice_mut(&mut data);
+    let range = bytes.range_mut(1..4);
+    range[0] = 99;
+    range[2] = 100;
+    assert_eq!(bytes, &[5, 99, 7, 100, 9]);
 }
