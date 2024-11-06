@@ -20,6 +20,21 @@ impl ByteVec {
     }
 
     #[inline]
+    pub fn from_vec(vec: Vec<u8>) -> Self {
+        Self(vec)
+    }
+
+    #[inline]
+    pub fn from_slice(slice: &[u8]) -> Self {
+        Self(slice.to_vec())
+    }
+
+    #[inline]
+    pub fn from_bytes(bytes: &ByteSlice) -> Self {
+        Self(bytes.to_vec())
+    }
+
+    #[inline]
     pub fn as_slice(&self) -> &[u8] {
         self.0.as_slice()
     }

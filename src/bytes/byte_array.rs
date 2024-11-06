@@ -1,5 +1,10 @@
 use crate::bytes::ByteSlice;
-use core::ops::{Deref, DerefMut};
+use core::{
+    ops::{Deref, DerefMut},
+    slice::SliceIndex,
+};
+
+use super::{ByteVec, Bytes};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(transparent)]
@@ -238,6 +243,68 @@ impl<const N: usize> DerefMut for ByteArray<N> {
     #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
+    }
+}
+
+impl<const N: usize> Bytes for ByteArray<N> {
+    #[inline]
+    fn as_bytes(&self) -> &ByteSlice {
+        ByteSlice::from_slice(self.as_slice())
+    }
+
+    #[inline]
+    fn as_slice(&self) -> &[u8] {
+        &self.0
+    }
+
+    #[inline]
+    fn get(&self, index: usize) -> Option<u8> {
+        self.0.get(index).copied()
+    }
+
+    #[inline]
+    fn get_mut(&mut self, index: usize) -> Option<&mut u8> {
+        self.0.get_mut(index)
+    }
+
+    #[inline]
+    fn range(&self, range: impl SliceIndex<[u8], Output = [u8]>) -> &ByteSlice {
+        ByteSlice::from_slice(&self.0[range])
+    }
+
+    #[inline]
+    fn range_mut(&mut self, range: impl SliceIndex<[u8], Output = [u8]>) -> &mut ByteSlice {
+        ByteSlice::from_slice_mut(&mut self.0[range])
+    }
+
+    #[inline]
+    fn len(&self) -> usize {
+        self.0.len()
+    }
+
+    #[inline]
+    fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+
+    #[inline]
+    fn split_at(&self, mid: usize) -> (&ByteSlice, &ByteSlice) {
+        let (left, right) = self.0.split_at(mid);
+        (ByteSlice::from_slice(left), ByteSlice::from_slice(right))
+    }
+
+    #[inline]
+    fn split_at_mut(&mut self, mid: usize) -> (&mut ByteSlice, &mut ByteSlice) {
+        let (left, right) = self.0.split_at_mut(mid);
+        (
+            ByteSlice::from_slice_mut(left),
+            ByteSlice::from_slice_mut(right),
+        )
+    }
+
+    #[inline]
+    fn to_vec(&self) -> super::ByteVec {
+        ByteVec::from_vec(self.0.to_vec())
     }
 }
 
