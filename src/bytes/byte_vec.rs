@@ -6,6 +6,9 @@ use core::{
 
 use alloc::vec::Vec;
 
+#[cfg(test)]
+use alloc::vec;
+
 use super::Bytes;
 use crate::bytes::ByteSlice;
 
@@ -214,4 +217,187 @@ impl From<&mut ByteSlice> for Vec<u8> {
     fn from(byte_slice: &mut ByteSlice) -> Self {
         byte_slice.as_slice().to_vec()
     }
+}
+
+impl<const N: usize> From<&[u8; N]> for ByteVec {
+    #[inline]
+    fn from(array: &[u8; N]) -> Self {
+        Self::from_slice(array)
+    }
+}
+
+impl<const N: usize> From<&mut [u8; N]> for ByteVec {
+    #[inline]
+    fn from(array: &mut [u8; N]) -> Self {
+        Self::from_slice(array)
+    }
+}
+
+#[test]
+fn test_new() {
+    let byte_vec = ByteVec::new();
+    assert!(byte_vec.is_empty());
+}
+
+#[test]
+fn test_with_capacity() {
+    let byte_vec = ByteVec::with_capacity(10);
+    assert_eq!(byte_vec.as_vec().capacity(), 10);
+}
+
+#[test]
+fn test_from_vec() {
+    let vec = vec![1, 2, 3];
+    let byte_vec = ByteVec::from_vec(vec.clone());
+    assert_eq!(byte_vec.as_slice(), vec.as_slice());
+}
+
+#[test]
+fn test_from_slice() {
+    let slice = &[1, 2, 3];
+    let byte_vec = ByteVec::from_slice(slice);
+    assert_eq!(byte_vec.as_slice(), slice);
+}
+
+#[test]
+fn test_from_bytes() {
+    let byte_slice = ByteSlice::from_slice(&[1, 2, 3]);
+    let byte_vec = ByteVec::from_bytes(&byte_slice);
+    assert_eq!(byte_vec.as_slice(), byte_slice.as_slice());
+}
+
+#[test]
+fn test_as_slice() {
+    let vec = vec![1, 2, 3];
+    let byte_vec = ByteVec::from_vec(vec.clone());
+    assert_eq!(byte_vec.as_slice(), vec.as_slice());
+}
+
+#[test]
+fn test_as_bytes() {
+    let vec = vec![1, 2, 3];
+    let byte_vec = ByteVec::from_vec(vec.clone());
+    assert_eq!(byte_vec.as_bytes().as_slice(), vec.as_slice());
+}
+
+#[test]
+fn test_as_vec() {
+    let vec = vec![1, 2, 3];
+    let byte_vec = ByteVec::from_vec(vec.clone());
+    assert_eq!(byte_vec.as_vec(), &vec);
+}
+
+#[test]
+fn test_deref() {
+    let vec = vec![1, 2, 3];
+    let byte_vec = ByteVec::from_vec(vec.clone());
+    assert_eq!(&*byte_vec, vec.as_slice());
+}
+
+#[test]
+fn test_deref_mut() {
+    let mut byte_vec = ByteVec::from_vec(vec![1, 2, 3]);
+    byte_vec[0] = 4;
+    assert_eq!(byte_vec.as_slice(), &[4, 2, 3]);
+}
+
+#[test]
+fn test_len() {
+    let byte_vec = ByteVec::from_vec(vec![1, 2, 3]);
+    assert_eq!(byte_vec.len(), 3);
+}
+
+#[test]
+fn test_is_empty() {
+    let byte_vec = ByteVec::new();
+    assert!(byte_vec.is_empty());
+}
+
+#[test]
+fn test_split_at() {
+    let byte_vec = ByteVec::from_vec(vec![1, 2, 3, 4]);
+    let (left, right) = byte_vec.split_at(2);
+    assert_eq!(left.as_slice(), &[1, 2]);
+    assert_eq!(right.as_slice(), &[3, 4]);
+}
+
+#[test]
+fn test_split_at_mut() {
+    let mut byte_vec = ByteVec::from_vec(vec![1, 2, 3, 4]);
+    let (left, right) = byte_vec.split_at_mut(2);
+    left[0] = 5;
+    right[0] = 6;
+    assert_eq!(byte_vec.as_slice(), &[5, 2, 6, 4]);
+}
+
+#[test]
+fn test_to_vec() {
+    let byte_vec = ByteVec::from_vec(vec![1, 2, 3]);
+    let cloned_vec = byte_vec.to_vec();
+    assert_eq!(byte_vec, cloned_vec);
+}
+#[test]
+fn test_get() {
+    let byte_vec = ByteVec::from_vec(vec![1, 2, 3]);
+    assert_eq!(byte_vec.get(1), Some(2));
+    assert_eq!(byte_vec.get(3), None);
+}
+
+#[test]
+fn test_get_mut() {
+    let mut byte_vec = ByteVec::from_vec(vec![1, 2, 3]);
+    if let Some(value) = byte_vec.get_mut(1) {
+        *value = 4;
+    }
+    assert_eq!(byte_vec.as_slice(), &[1, 4, 3]);
+}
+
+#[test]
+fn test_range() {
+    let byte_vec = ByteVec::from_vec(vec![1, 2, 3, 4]);
+    let range = byte_vec.range(1..3);
+    assert_eq!(range.as_slice(), &[2, 3]);
+}
+
+#[test]
+fn test_range_mut() {
+    let mut byte_vec = ByteVec::from_vec(vec![1, 2, 3, 4]);
+    let range = byte_vec.range_mut(1..3);
+    range[0] = 5;
+    assert_eq!(byte_vec.as_slice(), &[1, 5, 3, 4]);
+}
+
+#[test]
+fn test_from_byte_slice() {
+    let byte_slice = ByteSlice::from_slice(&[1, 2, 3]);
+    let byte_vec = ByteVec::from(byte_slice);
+    assert_eq!(byte_vec.as_slice(), &[1, 2, 3]);
+}
+
+#[test]
+fn test_from_vec_ref() {
+    let vec = vec![1, 2, 3];
+    let byte_vec = ByteVec::from(&vec);
+    assert_eq!(byte_vec.as_slice(), &[1, 2, 3]);
+}
+
+#[test]
+fn test_from_slice_ref() {
+    let slice = &[1u8, 2u8, 3u8];
+    let byte_vec = ByteVec::from(slice);
+    assert_eq!(byte_vec.as_slice(), slice);
+}
+
+#[test]
+fn test_from_mut_vec() {
+    let mut vec = vec![1, 2, 3];
+    let byte_vec = ByteVec::from(&mut vec);
+    assert_eq!(byte_vec.as_slice(), &[1, 2, 3]);
+}
+
+#[test]
+fn test_from_mut_slice() {
+    let slice = &mut [1u8, 2u8, 3u8];
+    let byte_vec = ByteVec::from(slice);
+    assert_eq!(byte_vec.as_slice(), &[1, 2, 3]);
 }
