@@ -43,6 +43,11 @@ impl ByteVec {
     pub fn as_bytes(&self) -> &ByteSlice {
         ByteSlice::from_slice(self.as_slice())
     }
+
+    #[inline]
+    pub const fn as_vec(&self) -> &Vec<u8> {
+        &self.0
+    }
 }
 
 impl Deref for ByteVec {
