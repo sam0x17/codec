@@ -401,3 +401,28 @@ fn test_from_mut_slice() {
     let byte_vec = ByteVec::from(slice);
     assert_eq!(byte_vec.as_slice(), &[1, 2, 3]);
 }
+#[test]
+fn test_with_capacity_zero() {
+    let byte_vec = ByteVec::with_capacity(0);
+    assert_eq!(byte_vec.as_vec().capacity(), 0);
+    assert!(byte_vec.is_empty());
+}
+
+#[test]
+fn test_from_empty_slice() {
+    let slice: &[u8] = &[];
+    let byte_vec = ByteVec::from_slice(slice);
+    assert!(byte_vec.is_empty());
+}
+
+#[test]
+fn test_split_at_bounds() {
+    let byte_vec = ByteVec::from_vec(vec![1, 2, 3, 4]);
+    let (left, right) = byte_vec.split_at(0);
+    assert!(left.is_empty());
+    assert_eq!(right.as_slice(), &[1, 2, 3, 4]);
+
+    let (left, right) = byte_vec.split_at(4);
+    assert_eq!(left.as_slice(), &[1, 2, 3, 4]);
+    assert!(right.is_empty());
+}
