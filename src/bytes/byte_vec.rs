@@ -6,9 +6,8 @@ use core::{
 
 use alloc::vec::Vec;
 
-use crate::bytes::ByteSlice;
-
 use super::Bytes;
+use crate::bytes::ByteSlice;
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct ByteVec(Vec<u8>);
@@ -130,5 +129,89 @@ impl Bytes for ByteVec {
     #[inline]
     fn to_vec(&self) -> ByteVec {
         self.clone()
+    }
+}
+
+impl From<ByteVec> for Vec<u8> {
+    #[inline]
+    fn from(byte_vec: ByteVec) -> Self {
+        byte_vec.0
+    }
+}
+
+impl From<Vec<u8>> for ByteVec {
+    #[inline]
+    fn from(vec: Vec<u8>) -> Self {
+        Self(vec)
+    }
+}
+
+impl From<&ByteVec> for Vec<u8> {
+    #[inline]
+    fn from(byte_vec: &ByteVec) -> Self {
+        byte_vec.0.clone()
+    }
+}
+
+impl From<&Vec<u8>> for ByteVec {
+    #[inline]
+    fn from(vec: &Vec<u8>) -> Self {
+        Self(vec.clone())
+    }
+}
+
+impl From<&[u8]> for ByteVec {
+    #[inline]
+    fn from(slice: &[u8]) -> Self {
+        Self(slice.to_vec())
+    }
+}
+
+impl From<&ByteSlice> for ByteVec {
+    #[inline]
+    fn from(byte_slice: &ByteSlice) -> Self {
+        Self(byte_slice.as_slice().to_vec())
+    }
+}
+
+impl From<&mut ByteVec> for Vec<u8> {
+    #[inline]
+    fn from(byte_vec: &mut ByteVec) -> Self {
+        byte_vec.0.clone()
+    }
+}
+
+impl From<&mut Vec<u8>> for ByteVec {
+    #[inline]
+    fn from(vec: &mut Vec<u8>) -> Self {
+        Self(vec.clone())
+    }
+}
+
+impl From<&mut [u8]> for ByteVec {
+    #[inline]
+    fn from(slice: &mut [u8]) -> Self {
+        Self(slice.to_vec())
+    }
+}
+
+impl From<&mut ByteSlice> for ByteVec {
+    #[inline]
+    fn from(byte_slice: &mut ByteSlice) -> Self {
+        Self(byte_slice.as_slice().to_vec())
+    }
+}
+
+impl From<&mut ByteVec> for ByteVec {
+    #[inline]
+    fn from(byte_vec: &mut ByteVec) -> Self {
+        byte_vec.clone()
+    }
+}
+
+impl From<&mut ByteSlice> for Vec<u8> {
+    #[inline]
+    fn from(byte_slice: &mut ByteSlice) -> Self {
+        byte_slice.as_slice().to_vec()
     }
 }
