@@ -1,3 +1,6 @@
+extern crate alloc;
+
+use alloc::vec::Vec;
 use core::{
     ops::{Deref, DerefMut, Range},
     slice::SliceIndex,
@@ -281,7 +284,9 @@ impl Bytes for ByteSlice {
 
     #[inline]
     fn to_vec(&self) -> ByteVec {
-        todo!()
+        let mut vec: Vec<u8> = Vec::with_capacity(self.len());
+        vec.extend_from_slice(self);
+        ByteVec::from_vec(vec)
     }
 
     #[inline]
