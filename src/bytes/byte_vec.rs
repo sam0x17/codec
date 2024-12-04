@@ -10,7 +10,7 @@ pub struct ByteVec(Vec<u8>);
 
 impl ByteVec {
     #[inline]
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self(Vec::new())
     }
 
@@ -20,7 +20,7 @@ impl ByteVec {
     }
 
     #[inline]
-    pub fn from_vec(vec: Vec<u8>) -> Self {
+    pub const fn from_vec(vec: Vec<u8>) -> Self {
         Self(vec)
     }
 

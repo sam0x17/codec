@@ -24,7 +24,7 @@ impl ByteSlice {
 
     /// Create a new `Bytes` from a mutable slice of bytes
     #[inline]
-    pub fn from_slice_mut(slice: &mut [u8]) -> &mut Self {
+    pub const fn from_slice_mut(slice: &mut [u8]) -> &mut Self {
         // Safety: `Bytes` is a transparent wrapper around `[u8]`
         unsafe { &mut *(slice as *mut [u8] as *mut ByteSlice) }
     }
